@@ -4,7 +4,7 @@ from ..db.models.main import User
 
 
 class UserRepository:
-    async def get_user_by_username(self, username: str) -> Optional[User]:
+    async def get_by_username(self, username: str) -> Optional[User]:
         return await User.get_or_none(username=username)
 
     async def create_user(self, username, password) -> User:

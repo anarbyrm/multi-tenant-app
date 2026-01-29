@@ -19,10 +19,8 @@ def generate_jwt(data: dict):
 
 
 def verify_jwt(token: str):
-    payload = jwt.decode(
+    return jwt.decode(
         token,
         settings.SECRET_KEY,
         algorithms=[settings.ALGORITHM]
     )
-
-    return payload

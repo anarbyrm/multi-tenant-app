@@ -25,7 +25,7 @@ class AuthService:
             # TODO: verify tenant id
             user = await self.tenant_user_repository.get_user_by_username(login_request.username, tenant_id)
         else:
-            user = await self.user_repository.get_user_by_username(login_request.username)
+            user = await self.user_repository.get_by_username(login_request.username)
 
         if not user or not verify_password(login_request.password, user.password):
             raise AppException("Invalid credentials.")
@@ -50,7 +50,7 @@ class AuthService:
                 tenant_id
             )
         else:
-            user = await self.user_repository.get_user_by_username(register_request.username)
+            user = await self.user_repository.get_by_username(register_request.username)
 
             if user:
                 raise user_exist_error

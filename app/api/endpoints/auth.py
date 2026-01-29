@@ -13,7 +13,7 @@ router = APIRouter(prefix='/auth')
 @router.post('/login', response_model=LoginResponse)
 async def login(
     request: LoginRequest,
-    tenant_id: Optional[str] = Header(alias="X-TENANT"),
+    tenant_id: Optional[str] = Header(default=None, alias="X-TENANT"),
     auth_service: AuthService = Depends()
 ):
     token = await auth_service.authenticate_user(request, tenant_id)
@@ -23,7 +23,7 @@ async def login(
 @router.post('/register')
 async def register(
     request: RegisterRequest,
-    tenant_id: Optional[str] = Header(alias="X-TENANT"),
+    tenant_id: Optional[str] = Header(default=None, alias="X-TENANT"),
     auth_service: AuthService = Depends()
 ):
     await auth_service.register_user(request, tenant_id)
