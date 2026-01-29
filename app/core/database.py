@@ -1,6 +1,6 @@
-from .settings import Settings
+from .settings import get_settings
 
-settings = Settings()
+settings = get_settings()
 
 TORTOISE_ORM_CONFIG = {
     "connections": {
@@ -13,7 +13,7 @@ TORTOISE_ORM_CONFIG = {
             "default_connection": "main",
         },
         "tenant": {
-            "models": ["app.db.models.tenant"],
+            "models": ["app.db.models.tenant", "aerich.models"],
             "default_connection": "tenant",
         },
     },
