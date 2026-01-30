@@ -7,7 +7,7 @@ from app.core.settings import get_settings
 settings = get_settings()
 
 
-def generate_jwt(data: dict):
+def generate_jwt(data: dict) -> str:
     expire = datetime.now() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE)
     data.update({"exp": expire})
 

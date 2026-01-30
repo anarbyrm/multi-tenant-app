@@ -22,7 +22,6 @@ class AuthService:
 
     async def authenticate_user(self, login_request: LoginRequest, tenant_id: Optional[str]):
         if tenant_id:
-            # TODO: verify tenant id
             user = await self.tenant_user_repository.get_user_by_username(login_request.username, tenant_id)
         else:
             user = await self.user_repository.get_by_username(login_request.username)
@@ -30,15 +29,32 @@ class AuthService:
         if not user or not verify_password(login_request.password, user.password):
             raise AppException("Invalid credentials.")
 
-        return generate_jwt({"user_id": user.id, "username": user.username})
+        user_data = {
+            "user_id": user.id,
+            "username": user.username
+        }
+
+        token = generate_jwt(user_data)
+        user_data.update({"token": token})
+
+        if not tenant_id:
+            organizations = []
+
+            for organization in user.organizations:
+                organizations.append({
+                    "name": organization.name,
+                    "tenant_code": str(organization.tenant_code)
+                })
+
+            user_data.update({"organizations": organizations})
+
+        return user_data
 
     async def register_user(self, register_request: RegisterRequest, tenant_id: Optional[str]):
         hashed_password = hash_password(register_request.password)
         user_exist_error = AppException("User already exists.")
 
         if tenant_id:
-            # TODO: verify tenant id
-
             user = await self.tenant_user_repository.get_user_by_username(register_request.username, tenant_id)
 
             if user:
