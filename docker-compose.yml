@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  db_main:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${MAIN_DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_main_data:/var/lib/postgresql/data
+
+  db_tenant:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${TENANT_DB_NAME}
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_tenant_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    depends_on:
+      - db_main
+      - db_tenant
+    env_file:
+      - .env
+    environment:
+      MAIN_DB_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db_main:5432/${MAIN_DB_NAME}
+      TENANT_DB_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db_tenant:5432/${TENANT_DB_NAME}
+    ports:
+      - "8000:8000"
+
+volumes:
+  db_main_data:
+  db_tenant_data:
