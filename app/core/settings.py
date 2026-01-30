@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    DEBUG: bool
     MAIN_DB_URL: PostgresDsn
     TENANT_DB_URL: PostgresDsn
     ACCESS_TOKEN_EXPIRE: int
