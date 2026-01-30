@@ -14,4 +14,4 @@ async def create_organization(
     current_user: dict = Depends(get_current_user),
     organization_service: OrganizationService = Depends()
 ):
-    return await organization_service.create_organization(request.name, current_user)
+    return await organization_service.create_organization(request.name, current_user['user_id'])

@@ -20,9 +20,9 @@ class AuthService:
         self.user_repository = user_repository
         self.tenant_user_repository = tenant_user_repository
 
-    async def authenticate_user(self, login_request: LoginRequest, tenant_id: Optional[str]):
+    async def authenticate_user(self, login_request: LoginRequest, tenant_id: Optional[str]) -> dict:
         if tenant_id:
-            user = await self.tenant_user_repository.get_user_by_username(login_request.username, tenant_id)
+            user = await self.tenant_user_repository.get_by_username(login_request.username, tenant_id)
         else:
             user = await self.user_repository.get_by_username(login_request.username)
 
@@ -55,7 +55,7 @@ class AuthService:
         user_exist_error = AppException("User already exists.")
 
         if tenant_id:
-            user = await self.tenant_user_repository.get_user_by_username(register_request.username, tenant_id)
+            user = await self.tenant_user_repository.get_by_username(register_request.username, tenant_id)
 
             if user:
                 raise user_exist_error

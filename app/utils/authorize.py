@@ -3,6 +3,7 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
+from app.repositories.tenant_user_repository import TenantUserRepository
 from app.repositories.user_repository import UserRepository
 from app.utils.jwt import verify_jwt
 
@@ -15,15 +16,15 @@ async def get_current_user(
 ) -> dict:
     token = credentials.credentials
     payload = verify_jwt(token)
-    username = payload.get("username")
+    user_id = payload.get("user_id")
 
-    if not username:
+    if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token payload",
         )
 
-    user = await user_repo.get_by_username(username)
+    user = await user_repo.get_by_id(user_id)
 
     if not user:
         raise HTTPException(
@@ -62,3 +63,32 @@ async def authorize_current_tenant(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="User is not authorized for this tenant",
     )
+
+
+async def get_current_tenant_user(
+    tenant_id: str = Header(..., alias="X-TENANT"),
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    user_repo: TenantUserRepository = Depends(),
+):
+    token = credentials.credentials
+    payload = verify_jwt(token)
+    user_id = payload.get("user_id")
+
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+        )
+
+    user = await user_repo.get_by_id(user_id, tenant_id)
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Tenant user not found",
+        )
+
+    return {
+        "user_id": user.id,
+        "username": user.username,
+    }
