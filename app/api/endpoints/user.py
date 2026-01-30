@@ -19,7 +19,7 @@ async def get_profile(
     return await user_service.get_profile(tenant_user['username'], tenant_id)
 
 
-@router.put('/me', response_model=UpdateProfileResponse)
+@router.patch('/me', response_model=UpdateProfileResponse)
 async def update_profile(
     request: UpdateProfileRequest,
     tenant_id: str = Header(..., alias="X-TENANT"),
